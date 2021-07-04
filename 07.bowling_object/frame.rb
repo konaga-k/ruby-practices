@@ -8,11 +8,6 @@ class Frame
   def initialize(args)
     @first_shot = Shot.new(args[:first_mark])
     @second_shot = Shot.new(args[:second_mark])
-    post_initialize(args)
-  end
-
-  def post_initialize(_args)
-    nil
   end
 
   def score

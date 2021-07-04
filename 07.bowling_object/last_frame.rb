@@ -6,7 +6,8 @@ require_relative 'frame'
 class LastFrame < Frame
   attr_reader :third_shot
 
-  def post_initialize(args)
+  def initialize(args)
+    super(args)
     @third_shot = Shot.new(args[:third_mark])
   end
 

@@ -6,7 +6,8 @@ require_relative 'frame'
 class StandardFrame < Frame
   attr_reader :next_shot, :after_next_shot
 
-  def post_initialize(args)
+  def initialize(args)
+    super(args)
     @next_shot = Shot.new(args[:next_mark])
     @after_next_shot = Shot.new(args[:after_next_mark])
   end
