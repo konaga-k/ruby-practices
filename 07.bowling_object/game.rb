@@ -4,12 +4,12 @@ require_relative 'standard_frame'
 require_relative 'last_frame'
 
 class Game
-  attr_reader :result
+  attr_reader :frames
 
   STRIKE = 'X'
 
   def initialize(result)
-    @result = result
+    @frames = convert_result_to_frames(result)
   end
 
   def score
@@ -18,8 +18,8 @@ class Game
 
   private
 
-  def frames
-    marks_groups.map.with_index(1) do |marks, i|
+  def convert_result_to_frames(result)
+    marks_groups(result).map.with_index(1) do |marks, i|
       if i < last_frame_number
         StandardFrame.new(first_mark: marks.first_mark, second_mark: marks.second_mark,
                           next_mark: marks.next_mark, after_next_mark: marks.after_next_mark)
@@ -29,7 +29,7 @@ class Game
     end
   end
 
-  def marks_groups # rubocop:disable Metrics/MethodLength
+  def marks_groups(result) # rubocop:disable Metrics/MethodLength
     groups = []
     mark_index = 0
     marks = Struct.new(:first_mark, :second_mark, :third_mark, :next_mark, :after_next_mark)
