@@ -6,8 +6,6 @@ require_relative 'last_frame'
 class Game
   attr_reader :frames
 
-  STRIKE = 'X'
-
   def initialize(result)
     @frames = convert_result_to_frames(result)
   end
@@ -19,44 +17,29 @@ class Game
   private
 
   def convert_result_to_frames(result)
-    marks_groups(result).map.with_index(1) do |marks, i|
-      if i < last_frame_number
-        StandardFrame.new(first_mark: marks.first_mark, second_mark: marks.second_mark,
-                          next_mark: marks.next_mark, after_next_mark: marks.after_next_mark)
+    frames = []
+    result_array = result.split(',')
+
+    result_index = 0
+    frame_count = 1
+
+    while frame_count <= last_frame_number
+      if frame_count < last_frame_number
+        frame = StandardFrame.new(first_mark: result_array[result_index],
+                                  second_mark: result_array[result_index + 1],
+                                  third_mark: result_array[result_index + 2])
+        result_index = frame.strike? ? (result_index + 1) : (result_index + 2)
       else
-        LastFrame.new(first_mark: marks.first_mark, second_mark: marks.second_mark, third_mark: marks.third_mark)
+        frame = LastFrame.new(first_mark: result_array[result_index],
+                              second_mark: result_array[result_index + 1],
+                              third_mark: result_array[result_index + 2])
       end
-    end
-  end
+      frame_count += 1
 
-  def marks_groups(result) # rubocop:disable Metrics/MethodLength
-    groups = []
-    mark_index = 0
-    marks = Struct.new(:first_mark, :second_mark, :third_mark, :next_mark, :after_next_mark)
-
-    result_chars = result.split(',')
-    result_chars.each_with_index do |mark, i|
-      case mark_index
-      when 0
-        groups << marks.new(mark)
-        if mark == STRIKE
-          groups.last.next_mark = result_chars[i + 1]
-          groups.last.after_next_mark = result_chars[i + 2]
-          mark_index = groups.size == last_frame_number ? 1 : 0
-          next
-        end
-        mark_index += 1
-      when 1
-        groups.last.second_mark = mark
-        groups.last.next_mark = result_chars[i + 1]
-        groups.last.after_next_mark = result_chars[i + 2]
-        mark_index = groups.size == last_frame_number ? 2 : 0
-      when 2
-        groups.last.third_mark = mark
-      end
+      frames << frame
     end
 
-    groups
+    frames
   end
 
   def last_frame_number

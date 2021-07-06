@@ -4,30 +4,33 @@ require_relative 'shot'
 require_relative 'frame'
 
 class StandardFrame < Frame
-  attr_reader :next_shot, :after_next_shot
+  attr_reader :second_shot, :next_shot, :after_next_shot
 
   def initialize(args)
     super(args)
-    @next_shot = Shot.new(args[:next_mark])
-    @after_next_shot = Shot.new(args[:after_next_mark])
+    @second_shot = strike? ? nil : Shot.new(args[:second_mark])
+    @next_shot = strike? ? Shot.new(args[:second_mark]) : Shot.new(args[:third_mark])
+    @after_next_shot = strike? ? Shot.new(args[:third_mark]) : nil
   end
 
   def score
-    basic_score = [first_shot, second_shot].map(&:score).sum
-    return (basic_score + next_shot.score + after_next_shot.score) if strike?
-    return (basic_score + next_shot.score) if spare?
-
-    basic_score
+    if strike?
+      [first_shot, next_shot, after_next_shot].map(&:score).sum
+    elsif spare?
+      [first_shot, second_shot, next_shot].map(&:score).sum
+    else
+      [first_shot, second_shot].map(&:score).sum
+    end
   end
-
-  private
 
   def strike?
     first_shot.score == full_score
   end
 
+  private
+
   def spare?
-    first_shot.score < full_score && (first_shot.score + second_shot.score == full_score)
+    !strike? && ([first_shot, second_shot].map(&:score).sum == full_score)
   end
 
   def full_score

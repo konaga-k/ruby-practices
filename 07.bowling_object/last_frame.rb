@@ -4,10 +4,11 @@ require_relative 'shot'
 require_relative 'frame'
 
 class LastFrame < Frame
-  attr_reader :third_shot
+  attr_reader :second_shot, :third_shot
 
   def initialize(args)
     super(args)
+    @second_shot = Shot.new(args[:second_mark])
     @third_shot = Shot.new(args[:third_mark])
   end
 
